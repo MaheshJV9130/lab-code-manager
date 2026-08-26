@@ -1,5 +1,6 @@
 "use client";
 
+import Input from "@/components/Input";
 import { Editor } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -46,11 +47,37 @@ const ViewExperimentPage = () => {
   const handleDownload = () => {
     if (!experiment?.code) return;
 
-    const blob = new Blob([experiment.code], { type: "text/plain;charset=utf-8" });
+    const escapeHtml = (value = "") =>
+      String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    const content = `<!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${escapeHtml(experiment.title || "Experiment")}</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 24px; color: #111827;">
+          <p><strong>Experiment No:</strong> ${escapeHtml(experiment.experimentNumber ?? "")}</p>
+          <p><strong>Experiment Name:</strong> ${escapeHtml(experiment.title || "")}</p>
+          <p><strong>Code:</strong></p>
+          <pre style="white-space: pre-wrap; background: #f3f4f6; border: 1px solid #d1d5db; padding: 12px; font-family: Consolas, 'Courier New', monospace; border-radius: 6px;">${escapeHtml(experiment.code || "")}</pre>
+          <p><strong>Output:</strong></p>
+          <pre style="white-space: pre-wrap; background: #f3f4f6; border: 1px solid #d1d5db; padding: 12px; font-family: Consolas, 'Courier New', monospace; border-radius: 6px;">${escapeHtml(experiment.output || "")}</pre>
+        </body>
+      </html>`;
+
+    const blob = new Blob([content], {
+      type: "application/msword;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${(experiment.title || "experiment").replace(/\s+/g, "-").toLowerCase()}.txt`;
+    link.download = `${(experiment.title || "experiment").replace(/\s+/g, "-").toLowerCase()}.doc`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -112,64 +139,56 @@ const ViewExperimentPage = () => {
   }
 
   return (
-    <main className="flex-1 min-h-screen bg-gray-100 p-4 sm:p-6 overflow-auto">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-7">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 leading-tight">
-            Preview — {experiment.subject || ""} Exp {experiment.experimentNumber || ""} — {experiment.title || "Untitled"}
+    <main className="min-h-screen overflow-auto p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+            Experiment preview
+          </p>
+          <h1 className="text-2xl font-bold leading-tight text-slate-800 sm:text-3xl">
+            {experiment.subject || ""} • Exp {experiment.experimentNumber || ""} • {experiment.title || "Untitled"}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">View-only access mode for registered laboratory experiments.</p>
+          <p className="mt-2 text-sm text-slate-500">
+            View-only access mode for registered laboratory experiments.
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="grid grid-cols-1 gap-4 px-4 py-3 bg-gray-100 border-b border-gray-200 text-sm text-gray-600 md:grid-cols-3">
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="grid grid-cols-1 gap-4 border-b border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600 md:grid-cols-3">
             <div>
-              <div className="uppercase tracking-wide text-[10px] font-semibold text-gray-500">Subject</div>
-              <div className="mt-1 font-semibold text-gray-800">{experiment.subject || "—"}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Subject</div>
+              <div className="mt-1 font-semibold text-slate-800">{experiment.subject || "—"}</div>
             </div>
             <div>
-              <div className="uppercase tracking-wide text-[10px] font-semibold text-gray-500">Experiment Number</div>
-              <div className="mt-1 font-semibold text-gray-800">{experiment.experimentNumber || "—"}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Experiment Number</div>
+              <div className="mt-1 font-semibold text-slate-800">{experiment.experimentNumber || "—"}</div>
             </div>
             <div>
-              <div className="uppercase tracking-wide text-[10px] font-semibold text-gray-500">Experiment Title</div>
-              <div className="mt-1 font-semibold text-gray-800">{experiment.title || "—"}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Experiment Title</div>
+              <div className="mt-1 font-semibold text-slate-800">{experiment.title || "—"}</div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 p-4 border-b border-gray-200 bg-white">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-            >
+          <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white p-4">
+            <button type="button" onClick={handleCopy} className="primary-btn">
               {copyState}
             </button>
-            
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="px-3 py-2 border border-gray-300 bg-white text-gray-700 text-sm rounded-md hover:bg-gray-50"
-            >
+            <button type="button" onClick={handleDownload} className="secondary-btn">
               Download
             </button>
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="px-3 py-2 border border-gray-300 bg-white text-gray-700 text-sm rounded-md hover:bg-gray-50"
-            >
+            <button type="button" onClick={handleEdit} className="secondary-btn">
               Edit
             </button>
             <button
               type="button"
               onClick={handleDelete}
-              className="px-3 py-2 border border-red-300 bg-red-50 text-red-600 text-sm rounded-md hover:bg-red-100"
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
             >
               Delete
             </button>
           </div>
 
-          <div className="rounded-b-xl overflow-hidden border-t border-gray-200">
+          <div className="overflow-hidden border-b border-slate-200">
             <Editor
               height="420px"
               theme="vs-dark"
@@ -186,6 +205,18 @@ const ViewExperimentPage = () => {
                 wordWrap: "on",
               }}
             />
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <Input label="Output" id="output" readOnly>
+              <textarea
+                id="output"
+                value={experiment.output || ""}
+                placeholder="Paste your output here..."
+                className="form-textarea min-h-[160px]"
+                readOnly
+              />
+            </Input>
           </div>
         </div>
       </div>

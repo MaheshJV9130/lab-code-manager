@@ -45,11 +45,7 @@ const LeftMenu = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
-      }
+      setIsOpen(window.innerWidth >= 768);
     };
 
     handleResize();
@@ -58,90 +54,94 @@ const LeftMenu = () => {
   }, []);
 
   return (
-    <div className="relative w-full md:w-72 md:shrink-0 lg:w-80 xl:w-96">
-      <div className="flex items-center justify-between border-b border-black/25 bg-gray-50 p-4 md:hidden">
+    <aside className="relative w-full border-b border-slate-200 bg-slate-50/90 backdrop-blur-sm md:w-[300px] md:border-b-0 md:border-r md:shadow-sm lg:w-[330px] xl:w-[360px]">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white/80 p-4 md:hidden">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setIsOpen((value) => !value)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-xl text-gray-700 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-lg text-slate-700 shadow-sm transition hover:border-blue-200 hover:text-blue-600"
             aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? "✕" : "☰"}
           </button>
-          <h1 className="text-blue-800 font-bold text-lg">&lt;Code Manager/&gt;</h1>
+          <h1 className="text-lg font-bold text-blue-700">Code Manager</h1>
         </div>
         <button
+          type="button"
           onClick={() => router.push("/")}
-          className="text-sm px-2.5 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-sm"
+          className="primary-btn px-3 py-2 text-xs"
         >
           New
         </button>
       </div>
 
       <div
-        className={`
-          absolute left-0 right-0 top-full z-20 border-b border-black/25 bg-gray-50 shadow-lg transition-all duration-200 md:static md:block md:shadow-none md:border-b-0 md:border-r
-          ${isOpen ? "block" : "hidden"}
-        `}
+        className={`overflow-hidden transition-all duration-200 md:block ${
+          isOpen ? "block" : "hidden"
+        }`}
       >
-        <div className="flex min-h-[calc(100vh-3.5rem)] flex-col bg-gray-50 md:min-h-screen md:max-h-screen">
-          <header className="p-4 border-b border-black/25">
+        <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-slate-50 md:min-h-screen md:max-h-screen">
+          <header className="border-b border-slate-200 bg-white/80 p-4">
             <div className="hidden items-center justify-between gap-3 md:flex">
-              <h1 className="text-blue-800 font-bold text-xl">&lt;Code Manager/&gt;</h1>
+              <h1 className="text-xl font-bold text-blue-700">Code Manager</h1>
               <button
+                type="button"
                 onClick={() => router.push("/")}
-                className="text-sm px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="primary-btn px-3 py-2 text-xs"
               >
                 New
               </button>
             </div>
 
-            <div className="mt-3 md:mt-0">
+            <div className="mt-4 md:mt-3">
               <div className="relative">
                 <input
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search experiments"
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-10 text-sm text-gray-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+                  className="form-input pr-10"
                   aria-label="Search experiments"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
                     aria-label="Clear search"
                   >
                     ✕
                   </button>
                 )}
               </div>
-              <h2 className="text-sm font-medium mt-3 text-gray-700">
-                Saved Codes ({filteredExperiments.length})
-              </h2>
+              <div className="mt-3 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-slate-700">Saved Codes</h2>
+                <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                  {filteredExperiments.length}
+                </span>
+              </div>
             </div>
           </header>
 
-          <ul className="flex-1 space-y-3 overflow-y-auto p-2 md:max-h-[calc(100vh-6.5rem)]">
+          <ul className="flex-1 space-y-3 overflow-y-auto p-3 md:max-h-[calc(100vh-8.5rem)]">
             {loading ? (
               Array.from({ length: 5 }).map((_, index) => (
-                <li key={index} className="animate-pulse rounded-lg border border-gray-200 bg-white p-3">
+                <li key={index} className="animate-pulse rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-1.5 rounded bg-gray-200" />
+                    <div className="h-8 w-1.5 rounded-full bg-slate-200" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 w-2/3 rounded bg-gray-200" />
-                      <div className="h-2.5 w-1/2 rounded bg-gray-200" />
+                      <div className="h-3 w-2/3 rounded bg-slate-200" />
+                      <div className="h-2.5 w-1/2 rounded bg-slate-200" />
                     </div>
                     <div className="flex gap-2">
-                      <div className="h-8 w-8 rounded bg-gray-200" />
-                      <div className="h-8 w-8 rounded bg-gray-200" />
+                      <div className="h-8 w-8 rounded-lg bg-slate-200" />
+                      <div className="h-8 w-8 rounded-lg bg-slate-200" />
                     </div>
                   </div>
                 </li>
               ))
             ) : filteredExperiments.length === 0 ? (
-              <li className="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500 text-center">
+              <li className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500 shadow-sm">
                 No matching experiments found.
               </li>
             ) : (
@@ -150,7 +150,7 @@ const LeftMenu = () => {
           </ul>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

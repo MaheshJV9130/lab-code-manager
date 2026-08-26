@@ -24,9 +24,9 @@ export async function PUT(request, { params }) {
   const subject = normalizeText(body.subject);
   const experimentNumber = Number(body.experimentNumber);
 
-  if (!subject || !Number.isFinite(experimentNumber) || !body.code?.trim()) {
+  if (!subject || !Number.isFinite(experimentNumber) || !body.code?.trim() || !body.output?.trim()) {
     return NextResponse.json(
-      { message: "Subject, experiment number, and code are required." },
+      { message: "Subject, experiment number, code, and output are required." },
       { status: 400 }
     );
   }
@@ -51,6 +51,7 @@ export async function PUT(request, { params }) {
       experimentNumber,
       title: normalizeText(body.title),
       code: body.code,
+      output: body.output,
       language: body.language || "javascript",
     },
     { new: true }
