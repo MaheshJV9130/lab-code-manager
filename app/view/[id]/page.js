@@ -112,17 +112,17 @@ const ViewExperimentPage = () => {
   }
 
   return (
-    <main className="flex-1 min-h-screen bg-gray-100 p-6 overflow-auto">
+    <main className="flex-1 min-h-screen bg-gray-100 p-4 sm:p-6 overflow-auto">
       <div className="max-w-6xl mx-auto">
         <div className="mb-7">
-          <h1 className="text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 leading-tight">
             Preview — {experiment.subject || ""} Exp {experiment.experimentNumber || ""} — {experiment.title || "Untitled"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">View-only access mode for registered laboratory experiments.</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 py-3 bg-gray-100 border-b border-gray-200 text-sm text-gray-600">
+          <div className="grid grid-cols-1 gap-4 px-4 py-3 bg-gray-100 border-b border-gray-200 text-sm text-gray-600 md:grid-cols-3">
             <div>
               <div className="uppercase tracking-wide text-[10px] font-semibold text-gray-500">Subject</div>
               <div className="mt-1 font-semibold text-gray-800">{experiment.subject || "—"}</div>
