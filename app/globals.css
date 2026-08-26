@@ -1,16 +1,83 @@
 @import "tailwindcss";
 
-.btn{
-    @apply outline-0 border-0 p-2 m-1 cursor-pointer  bg-slate-400/35 rounded-xs
+:root {
+  color-scheme: light;
 }
 
-.input-fields{
-    @apply flex flex-col justify-center items-start gap-2 
+html {
+  scroll-behavior: smooth;
 }
 
-.input-box{
-    @apply w-full py-3 pl-2 border border-black/40 focus:outline-0 rounded-lg
+body {
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
 }
-/* .labels{
-    @apply 
-} */
+
+* {
+  box-sizing: border-box;
+}
+
+@layer components {
+  .primary-btn {
+    @apply inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100;
+  }
+
+  .secondary-btn {
+    @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-100;
+  }
+
+  .panel-surface {
+    @apply rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-100;
+  }
+
+  .form-input {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #334155;
+    box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-input::placeholder {
+    color: #94a3b8;
+  }
+
+  .form-input:focus {
+    border-color: #60a5fa;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(191, 219, 254, 0.7);
+  }
+
+  .form-textarea {
+    width: 100%;
+    min-height: 140px;
+    resize: vertical;
+    font-family: var(--font-geist-mono), "SFMono-Regular", Consolas, monospace;
+    font-size: 0.8125rem;
+    display: block;
+    padding: 8px;
+  }
+
+  .form-select {
+    padding-right: 2.5rem;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.5);
+}

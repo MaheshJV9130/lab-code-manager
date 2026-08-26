@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-slate-100 text-slate-800 md:flex-row">
+      <body className="min-h-screen bg-slate-100 text-slate-800 md:flex md:flex-row">
         <LeftMenu />
         <ToastContainer
           theme="dark"
@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
           closeOnClick
           pauseOnHover
         />
-        <div className="flex-1 min-w-0">{children}</div>
+        <div className="flex-1 min-w-0 overflow-hidden">{children}</div>
       </body>
     </html>
   );

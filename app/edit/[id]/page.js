@@ -34,7 +34,7 @@ const EditExperimentPage = () => {
     watch,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       subject: "",
@@ -42,6 +42,7 @@ const EditExperimentPage = () => {
       title: "",
       language: "javascript",
       code: "",
+      output: "",
     },
   });
 
@@ -59,6 +60,7 @@ const EditExperimentPage = () => {
           title: res.experiment.title,
           language: res.experiment.language || "javascript",
           code: res.experiment.code,
+          output: res.experiment.output || "",
         });
       }
     };
@@ -89,23 +91,28 @@ const EditExperimentPage = () => {
   };
 
   return (
-    <main className="flex-1 h-screen overflow-auto p-6">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen overflow-auto p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-5xl">
         <header className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800">Edit Experiment</h1>
-          <p className="text-sm text-gray-600 mt-1">Update the experiment details and source code.</p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+            Edit record
+          </p>
+          <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">Edit Experiment</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Update the experiment details, source code, and captured output.
+          </p>
         </header>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-2xl shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="panel-surface space-y-6 p-4 sm:p-6">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
             <Input label="Subject" id="subject" error={errors.subject}>
               <input
                 id="subject"
                 {...register("subject", {
                   required: { value: true, message: "Subject is required" },
                 })}
-                placeholder="Enter Subject"
-                className="w-full rounded-md border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-200 p-2"
+                placeholder="Enter subject"
+                className="form-input"
               />
             </Input>
 
@@ -118,7 +125,7 @@ const EditExperimentPage = () => {
                   min: { value: 1, message: "Must be >= 1" },
                 })}
                 placeholder="1"
-                className="w-full rounded-md border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-200 p-2"
+                className="form-input"
               />
             </Input>
           </div>
@@ -129,19 +136,19 @@ const EditExperimentPage = () => {
               {...register("title", {
                 required: { value: true, message: "Title is required" },
               })}
-              placeholder="Enter Title"
-              className="w-full rounded-md border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-200 p-2"
+              placeholder="Enter title"
+              className="form-input"
             />
           </Input>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">Code</label>
+            <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <label className="text-sm font-semibold text-slate-700">Code</label>
               <Controller
                 name="language"
                 control={control}
                 render={({ field }) => (
-                  <select {...field} className="text-sm rounded-md border-gray-200 p-1">
+                  <select {...field} className="form-select sm:w-auto">
                     {LANG_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
@@ -152,7 +159,7 @@ const EditExperimentPage = () => {
               />
             </div>
 
-            <div className="rounded-md overflow-hidden border">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-900 shadow-inner sm:rounded-2xl">
               <Controller
                 name="code"
                 control={control}
@@ -168,19 +175,35 @@ const EditExperimentPage = () => {
                 )}
               />
             </div>
-            {errors.code && <p className="text-xs text-red-600 mt-2">{errors.code.message}</p>}
+            {errors.code && <p className="mt-2 text-xs text-red-600">{errors.code.message}</p>}
           </div>
 
-          <div className="flex justify-end gap-3">
+          <Input label="Output" id="output" error={errors.output}>
+            <textarea
+              id="output"
+              rows={5}
+              {...register("output", {
+                required: { value: true, message: "Output is required" },
+              })}
+              placeholder="Paste your output here..."
+              className="form-textarea min-h-[110px] sm:min-h-[140px]"
+            />
+          </Input>
+
+          <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
             <button
               type="button"
               onClick={() => router.push(`/view/${params.id}`)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              className="secondary-btn w-full sm:w-auto"
             >
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-              Update
+            <button
+              type="submit"
+              className="primary-btn w-full disabled:cursor-not-allowed disabled:bg-blue-300 sm:w-auto"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Updating..." : "Update Experiment"}
             </button>
           </div>
         </form>

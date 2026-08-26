@@ -5,6 +5,7 @@ const experimentSchema = new Schema({
   experimentNumber: { type: Number, required: true },
   title: { type: String, required: true, trim: true },
   code: { type: String, required: true },
+  output:{type : String , require : true},
   language: { type: String, required: true },
 });
 
