@@ -2,6 +2,7 @@
 
 import Input from "@/components/Input";
 import { Editor } from "@monaco-editor/react";
+import JSZip from "jszip";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -44,40 +45,60 @@ const ViewExperimentPage = () => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!experiment?.code) return;
 
-    const escapeHtml = (value = "") =>
+    const escapeXml = (value = "") =>
       String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/'/g, "&apos;");
 
-    const content = `<!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>${escapeHtml(experiment.title || "Experiment")}</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; padding: 24px; color: #111827;">
-          <p><strong>Experiment No:</strong> ${escapeHtml(experiment.experimentNumber ?? "")}</p>
-          <p><strong>Experiment Name:</strong> ${escapeHtml(experiment.title || "")}</p>
-          <p><strong>Code:</strong></p>
-          <pre style="white-space: pre-wrap; background: #f3f4f6; border: 1px solid #d1d5db; padding: 12px; font-family: Consolas, 'Courier New', monospace; border-radius: 6px;">${escapeHtml(experiment.code || "")}</pre>
-          <p><strong>Output:</strong></p>
-          <pre style="white-space: pre-wrap; background: #f3f4f6; border: 1px solid #d1d5db; padding: 12px; font-family: Consolas, 'Courier New', monospace; border-radius: 6px;">${escapeHtml(experiment.output || "")}</pre>
-        </body>
-      </html>`;
+    const zip = new JSZip();
+    zip.file(
+      "[Content_Types].xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`
+    );
 
-    const blob = new Blob([content], {
-      type: "application/msword;charset=utf-8",
-    });
+    zip.file(
+      "_rels/.rels",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`
+    );
+
+    zip.file(
+      "word/document.xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Experiment No: ${escapeXml(experiment.experimentNumber ?? "")}</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Experiment Name: ${escapeXml(experiment.title || "")}</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Code:</w:t></w:r></w:p>
+    <w:p><w:r><w:t>${escapeXml(experiment.code || "")}</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Output:</w:t></w:r></w:p>
+    <w:p><w:r><w:t>${escapeXml(experiment.output || "")}</w:t></w:r></w:p>
+    <w:sectPr>
+      <w:pgSz w:w="12240" w:h="15840"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`
+    );
+
+    const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${(experiment.title || "experiment").replace(/\s+/g, "-").toLowerCase()}.doc`;
+    link.download = `${(experiment.title || "experiment").replace(/\s+/g, "-").toLowerCase()}.docx`;
     link.click();
     URL.revokeObjectURL(url);
   };
