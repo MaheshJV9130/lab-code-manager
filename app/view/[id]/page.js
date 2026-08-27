@@ -2,7 +2,18 @@
 
 import Input from "@/components/Input";
 import { Editor } from "@monaco-editor/react";
-import JSZip from "jszip";
+import {
+  AlignmentType,
+  BorderStyle,
+  Document,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+} from "docx";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -39,62 +50,93 @@ const ViewExperimentPage = () => {
     setTimeout(() => setCopyState("Copy Code"), 1200);
   };
 
-  const handleSelectAll = () => {
-    if (editorRef.current) {
-      editorRef.current.getAction("editor.action.selectAll")?.run();
-    }
-  };
 
   const handleDownload = async () => {
     if (!experiment?.code) return;
 
-    const escapeXml = (value = "") =>
-      String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&apos;");
+    const createLabel = (text) =>
+      new Paragraph({
+        children: [new TextRun({ text, bold: true, size: 22 })],
+        spacing: { after: 30 },
+      });
 
-    const zip = new JSZip();
-    zip.file(
-      "[Content_Types].xml",
-      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>`
-    );
+    const createCodeBlock = (value) => {
+      const lines = (value || "").split(/\r?\n/);
+      const content = lines.length > 0 ? lines : [" "];
 
-    zip.file(
-      "_rels/.rels",
-      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>`
-    );
+      return new Table({
+        width: { size: 85, type: WidthType.PERCENTAGE },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+          bottom: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+          left: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+          right: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+          insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+          insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                shading: { fill: "E8E8E8" },
+                margins: { top: 80, bottom: 80, left: 140, right: 80 },
+                children: content.map(
+                  (line) =>
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: line || " ",
+                          font: "Consolas",
+                          size: 19,
+                          color: "1F1F1F",
+                        }),
+                      ],
+                      spacing: { before: 0, after: 0, line: 260, lineRule: "auto" },
+                      indent: { left: 0 },
+                      alignment: AlignmentType.LEFT,
+                    })
+                ),
+              }),
+            ],
+          }),
+        ],
+      });
+    };
 
-    zip.file(
-      "word/document.xml",
-      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p><w:r><w:t>Experiment No: ${escapeXml(experiment.experimentNumber ?? "")}</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Experiment Name: ${escapeXml(experiment.title || "")}</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Code:</w:t></w:r></w:p>
-    <w:p><w:r><w:t>${escapeXml(experiment.code || "")}</w:t></w:r></w:p>
-    <w:p><w:r><w:t>Output:</w:t></w:r></w:p>
-    <w:p><w:r><w:t>${escapeXml(experiment.output || "")}</w:t></w:r></w:p>
-    <w:sectPr>
-      <w:pgSz w:w="12240" w:h="15840"/>
-      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/>
-    </w:sectPr>
-  </w:body>
-</w:document>`
-    );
+    const doc = new Document({
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: { top: 720, right: 720, bottom: 720, left: 720 },
+            },
+          },
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Experiment No: ${experiment.experimentNumber ?? ""}`, bold: true, size: 22 }),
+              ],
+              spacing: { after: 30 },
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: `Experiment Name: ${experiment.title || ""}`, bold: true, size: 22 }),
+              ],
+              spacing: { after: 70 },
+            }),
+            createLabel("Code:"),
+            createCodeBlock(experiment.code),
+            new Paragraph({
+              children: [new TextRun({ text: "Output:", bold: true, size: 22 })],
+              spacing: { before: 80, after: 30 },
+            }),
+            createCodeBlock(experiment.output),
+          ],
+        },
+      ],
+    });
 
-    const blob = await zip.generateAsync({ type: "blob" });
+    const blob = await Packer.toBlob(doc);
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
