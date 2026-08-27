@@ -1,21 +1,57 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import LeftMenu from "@/components/LeftMenu";
 import { ToastContainer } from "react-toastify";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'], 
+  variable: '--font-jetbrains-mono', 
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+ 
 export const metadata = {
-  title: "Code Manager",
-  description: "Laboratory experiment tracking and code management dashboard.",
+  metadataBase: new URL("https://labcodex.vercel.app"),
+  applicationName: "LabCodex",
+  title: {
+    default: "LabCodex | Laboratory Experiment Tracker",
+    template: "%s | LabCodex",
+  },
+  description:
+    "LabCodex helps students and lab teams record experiment details, manage source code, and capture outputs in a clean digital workspace.",
+  keywords: [
+    "lab experiments",
+    "code backup",
+    "no login",
+    "college lab",
+    "experiment tracker",
+    "programming assignments",
+    "LabCodex",
+  ],
+  authors: [{ name: "LabCodex" }],
+  creator: "LabCodex",
+  publisher: "LabCodex",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "LabCodex | Laboratory Experiment Tracker",
+    description:
+      "Track lab experiments, save code, and keep outputs organized in one secure workspace.",
+    siteName: "LabCodex",
+    type: "website",
+    url: "https://labcodex.vercel.app",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LabCodex",
+    description:
+      "Track lab experiments, save code, and keep outputs organized in one secure workspace.",
+  },
+  icons: {
+    icon: [{ url: "/favicon.png", sizes: "16x16", type: "image/png" }],
+    shortcut: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -23,7 +59,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${jetbrainsMono.variable} font-sans h-full antialiased`}
     >
       <body className="min-h-screen bg-slate-100 text-slate-800 md:flex md:flex-row">
         <LeftMenu />

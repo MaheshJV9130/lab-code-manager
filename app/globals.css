@@ -9,7 +9,7 @@ html {
 }
 
 body {
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--font-jetbrains-mono), Arial, sans-serif;
   background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
 }
 

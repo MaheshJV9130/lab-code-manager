@@ -65,7 +65,7 @@ const LeftMenu = () => {
           >
             {isOpen ? "✕" : "☰"}
           </button>
-          <h1 className="text-lg font-bold text-blue-700">Code Manager</h1>
+          <h1 className="text-lg font-bold text-blue-700">&lt;LabCodex/</h1>
         </div>
         <button
           type="button"
