@@ -65,7 +65,7 @@ const LeftMenu = () => {
           >
             {isOpen ? "✕" : "☰"}
           </button>
-          <h1 className="text-lg font-bold text-blue-700">&lt;LabCodex/</h1>
+          <h1 className="text-lg font-bold text-blue-700">&lt;LabCodex/&gt;</h1>
         </div>
         <button
           type="button"
@@ -84,7 +84,7 @@ const LeftMenu = () => {
         <div className="flex min-h-[calc(100vh-4rem)] flex-col bg-slate-50 md:min-h-screen md:max-h-screen">
           <header className="border-b border-slate-200 bg-white/80 p-4">
             <div className="hidden items-center justify-between gap-3 md:flex">
-              <h1 className="text-xl font-bold text-blue-700">Code Manager</h1>
+              <h1 className="text-xl font-bold text-blue-700">&lt;LabCodex/&gt;</h1>
               <button
                 type="button"
                 onClick={() => router.push("/")}
